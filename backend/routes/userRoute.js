@@ -4,6 +4,8 @@ import upload from '../middleware/multer.js';
 import authUser from '../middleware/authUser.js';
 const userRouter = express.Router();
 
+// http://localhost:4000/api/user/login
+
 userRouter.post("/register", registerUser)
 userRouter.post("/login", loginUser)
 
