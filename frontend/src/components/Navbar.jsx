@@ -21,20 +21,28 @@ const Navbar = () => {
       <img onClick={() => navigate('/')} className='w-44 cursor-pointer' src={assets.logo} alt="" />
       <ul className='md:flex items-start gap-5 font-medium hidden'>
         <NavLink to='/' >
-          <li className='py-1'>HOME</li>
+          <li className='py-1'>Home</li>
+          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+        </NavLink>
+        <NavLink to='/features' >
+          <li className='py-1'>Features</li>
           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
         <NavLink to='/doctors' >
-          <li className='py-1'>ALL DOCTORS</li>
+          <li className='py-1'>Doctors</li>
           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
         <NavLink to='/about' >
-          <li className='py-1'>ABOUT</li>
+          <li className='py-1'>About</li>
           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
         </NavLink>
         <NavLink to='/contact' >
-          <li className='py-1'>CONTACT</li>
+          <li className='py-1'>Contact</li>
           <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
+        </NavLink>
+        <NavLink to='/emergency'>
+          <li className='py-1 bg-red-300 px-2 rounded-full text-red-600'>Emergency</li>
+          <hr className='border-none outline-none h-0.5 bg-red-500  w-3/5 m-auto hidden' />
         </NavLink>
       </ul>
 
@@ -64,7 +72,8 @@ const Navbar = () => {
           </div>
           <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>
             <NavLink onClick={() => setShowMenu(false)} to='/'><p className='px-4 py-2 rounded full inline-block'>HOME</p></NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to='/doctors' ><p className='px-4 py-2 rounded full inline-block'>ALL DOCTORS</p></NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to='/'><p className='px-4 py-2 rounded full inline-block'>Features</p></NavLink>
+            <NavLink onClick={() => setShowMenu(false)} to='/doctors' ><p className='px-4 py-2 rounded full inline-block'>DOCTORS</p></NavLink>
             <NavLink onClick={() => setShowMenu(false)} to='/about' ><p className='px-4 py-2 rounded full inline-block'>ABOUT</p></NavLink>
             <NavLink onClick={() => setShowMenu(false)} to='/contact' ><p className='px-4 py-2 rounded full inline-block'>CONTACT</p></NavLink>
           </ul>
