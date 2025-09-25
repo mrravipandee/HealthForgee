@@ -130,6 +130,56 @@ const updateProfile = async (req, res) => {
     }
 }
 
+// API to update user health information
+const updateHealthInfo = async (req, res) => {
+    try {
+        const { userId, name, phone, gender, height, weight, bloodGroup, 
+                medicalConditions, currentMedications, allergies, 
+                dietPreference, activityLevel, exerciseRoutine, 
+                sleepDuration, alcoholOrSmoking, healthGoal, 
+                dietaryRestrictions, preferredExerciseType } = req.body;
+
+        // Prepare update object with only provided fields
+        const updateData = {};
+        
+        if (name) updateData.name = name;
+        if (phone) updateData.phone = phone;
+        if (gender) updateData.gender = gender;
+        if (height) updateData.height = height;
+        if (weight) updateData.weight = weight;
+        if (bloodGroup) updateData.bloodGroup = bloodGroup;
+        if (dietPreference) updateData.dietPreference = dietPreference;
+        if (activityLevel) updateData.activityLevel = activityLevel;
+        if (exerciseRoutine) updateData.exerciseRoutine = exerciseRoutine;
+        if (sleepDuration) updateData.sleepDuration = sleepDuration;
+        if (alcoholOrSmoking) updateData.alcoholOrSmoking = alcoholOrSmoking;
+        if (healthGoal) updateData.healthGoal = healthGoal;
+        if (preferredExerciseType) updateData.preferredExerciseType = preferredExerciseType;
+        
+        // Handle array fields
+        if (medicalConditions) {
+            updateData.medicalConditions = JSON.parse(medicalConditions);
+        }
+        if (currentMedications) {
+            updateData.currentMedications = JSON.parse(currentMedications);
+        }
+        if (allergies) {
+            updateData.allergies = JSON.parse(allergies);
+        }
+        if (dietaryRestrictions) {
+            updateData.dietaryRestrictions = JSON.parse(dietaryRestrictions);
+        }
+
+        await userModel.findByIdAndUpdate(userId, updateData);
+        
+        res.json({ success: true, message: 'Health information updated successfully!' });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
+
 // API to book appointment 
 const bookAppointment = async (req, res) => {
 
@@ -348,6 +398,7 @@ export {
     registerUser,
     getProfile,
     updateProfile,
+    updateHealthInfo,
     bookAppointment,
     listAppointment,
     cancelAppointment,

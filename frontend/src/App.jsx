@@ -12,12 +12,48 @@ import Footer from './components/Footer'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
+import PatientsInfo from './components/PatientsInfo'
+import { useEffect, useState, useContext } from 'react'
+import { AppContext } from './context/AppContext'
 
 const App = () => {
+  const { token, userData } = useContext(AppContext);
+  const [showPatientInfo, setShowPatientInfo] = useState(false);
+
+  // Check if user has completed health information
+  const hasHealthInfo = userData && (
+    userData.height || 
+    userData.weight || 
+    userData.bloodGroup !== 'Not Selected' ||
+    userData.medicalConditions?.length > 0 ||
+    userData.currentMedications?.length > 0 ||
+    userData.dietPreference !== 'Not Selected'
+  );
+
+  useEffect(() => {
+    // Show PatientsInfo form after login if user hasn't filled health info
+    if (token && userData && !hasHealthInfo) {
+      // Check if user has already dismissed the form in this session
+      const hasSeenForm = sessionStorage.getItem('hasSeenPatientForm');
+      if (!hasSeenForm) {
+        setShowPatientInfo(true);
+      }
+    }
+  }, [token, userData, hasHealthInfo]);
+
+  const handleClosePatientInfo = () => {
+    setShowPatientInfo(false);
+    // Remember that user has seen the form in this session
+    sessionStorage.setItem('hasSeenPatientForm', 'true');
+  };
+
   return (
     <div className='mx-4 sm:mx-[10%]'>
       <ToastContainer />
       <Navbar />
+      {showPatientInfo && (
+        <PatientsInfo onClose={handleClosePatientInfo} />
+      )}
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/doctors' element={<Doctors />} />
