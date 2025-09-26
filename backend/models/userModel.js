@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
     gender: { type: String, default: 'Not Selected' },
     dob: { type: String, default: 'Not Selected' },
     password: { type: String, required: true },
+    whatsapp: { type: String, default: '' },
+    bloodGroup: { type: String, default: '' },
+    aadhar: { type: String, default: '' },
+    allergies: { type: String, default: '' },
 })
 
 const userModel = mongoose.models.user || mongoose.model("user", userSchema);
