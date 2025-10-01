@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import axios from 'axios';
 
@@ -8,10 +8,14 @@ const AppContextProvider = (props) => {
 
     const currencySymbol = '₹';
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    
+    console.log('Backend URL from env:', backendUrl); // Debug log
 
     const [doctors, setDoctors] = useState([]);
     const [token, setToken] = useState(localStorage.getItem('token') || '');
     const [userData, setUserData] = useState(false);
+    
+    console.log('Initial token from localStorage:', localStorage.getItem('token')); // Debug log
 
     // Set default Authorization header for all requests if token exists
     useEffect(() => {
@@ -32,7 +36,7 @@ const AppContextProvider = (props) => {
     }, [token]);
 
     // Get Doctors from backend
-    const getDoctosData = async () => {
+    const getDoctosData = useCallback(async () => {
         try {
             const { data } = await axios.get(`${backendUrl}/api/doctor/list`);
             if (data.success) {
@@ -44,36 +48,45 @@ const AppContextProvider = (props) => {
             console.log(error);
             toast.error(error.response?.data?.message || error.message);
         }
-    };
+    }, [backendUrl]);
 
     // Get User Profile from backend
-    const loadUserProfileData = async () => {
+    const loadUserProfileData = useCallback(async () => {
         if (!token) return;
 
         try {
-            const { data } = await axios.get(`${backendUrl}/api/user/get-profile`);
+            console.log('Loading user profile with token:', token);
+            const { data } = await axios.get(`${backendUrl}/api/user/get-profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log('Profile response:', data);
             if (data.success) {
-                setUserData(data.userData);
+                setUserData(data.user); // Changed from userData to user as per backend response
+                console.log('User data set:', data.user);
             } else {
                 toast.error(data.message);
             }
         } catch (error) {
-            console.log(error);
+            console.log('Profile load error:', error);
             toast.error(error.response?.data?.message || error.message);
         }
-    };
+    }, [token, backendUrl]);
 
     // Load doctors on first mount
     useEffect(() => {
         getDoctosData();
-    }, []);
+    }, [getDoctosData]);
 
     // Load user profile whenever token changes
     useEffect(() => {
         if (token) {
             loadUserProfileData();
+        } else {
+            setUserData(false);
         }
-    }, [token]);
+    }, [token, loadUserProfileData]);
 
     const value = {
         doctors,
