@@ -119,18 +119,31 @@ const getProfile = async (req, res) => {
 // API to update user profile
 const updateProfile = async (req, res) => {
   try {
-    const { userId, name, phone, address, dob, gender } = req.body;
+    const { userId, name, phone, age, gender } = req.body;
     const imageFile = req.file;
 
-    if (!name || !phone || !dob || !gender) {
-      return res.json({ success: false, message: "Data Missing" });
+    // Debug: Log received data
+    console.log('Received data:', { userId, name, phone, age, gender });
+
+    // Check for missing required fields
+    const missingFields = [];
+    if (!name || name.trim() === '') missingFields.push('name');
+    if (!phone || phone.trim() === '') missingFields.push('phone');
+    if (!age || age.trim() === '') missingFields.push('age');
+    if (!gender || gender.trim() === '') missingFields.push('gender');
+
+    if (missingFields.length > 0) {
+      console.log('Missing fields:', missingFields);
+      return res.json({ 
+        success: false, 
+        message: `Missing required fields: ${missingFields.join(', ')}` 
+      });
     }
 
     await userModel.findByIdAndUpdate(userId, {
       name,
       phone,
-      address: JSON.parse(address),
-      dob,
+      age,
       gender,
     });
 
