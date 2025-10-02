@@ -26,7 +26,7 @@ const Login = () => {
           console.log('Registration successful, token:', data.token);
           localStorage.setItem('token', data.token)
           setToken(data.token)
-          toast.success('Account created successfully!')
+          toast.success('User account created successfully!')
         } else {
           toast.error(data.message)
         }
@@ -38,7 +38,7 @@ const Login = () => {
           console.log('Login successful, token:', data.token);
           localStorage.setItem('token', data.token)
           setToken(data.token)
-          toast.success('Login successful!')
+          toast.success('User login successful!')
         } else {
           toast.error(data.message)
         }

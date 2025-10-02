@@ -5,7 +5,6 @@ import connectDB from "./config/mongodb.js"
 import connectCloudinary from "./config/cloudinary.js"
 import userRouter from "./routes/userRoute.js"
 import doctorRouter from "./routes/doctorRoute.js"
-import adminRouter from "./routes/adminRoute.js"
 
 // app config
 const app = express()
@@ -19,11 +18,18 @@ app.use(cors())
 
 // api endpoints
 app.use("/api/user", userRouter)
-app.use("/api/admin", adminRouter)
 app.use("/api/doctor", doctorRouter)
 
 app.get("/", (req, res) => {
   res.send("API Working")
 });
 
-app.listen(port, () => console.log(`Server started on PORT:${port}`))
+app.listen(port, '0.0.0.0', (err) => {
+  if (err) {
+    console.error('Error starting server:', err);
+    return;
+  }
+  console.log(`Server started on PORT:${port}`);
+}).on('error', (err) => {
+  console.error('Server error:', err);
+});

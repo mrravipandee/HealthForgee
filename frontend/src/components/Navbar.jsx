@@ -60,7 +60,22 @@ const Navbar = () => {
                 </div>
               </div>
             </div>
-            : <button onClick={() => navigate('/login')} className='bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block'>Create account</button>
+            : <div className='relative group hidden md:block'>
+              <button className='bg-primary text-white px-8 py-3 rounded-full font-light flex items-center gap-2'>
+                Login
+                <img className='w-2.5' src={assets.dropdown_icon} alt="" />
+              </button>
+              <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
+                <div className='min-w-48 bg-white rounded-lg shadow-lg border flex flex-col gap-2 p-2'>
+                  <p onClick={() => navigate('/login')} className='hover:bg-gray-100 cursor-pointer px-4 py-2 rounded flex items-center gap-2'>
+                    Login as User
+                  </p>
+                  <p onClick={() => navigate('/doctor-registration')} className='hover:bg-gray-100 cursor-pointer px-4 py-2 rounded flex items-center gap-2'>
+                    Join as Doctor
+                  </p>
+                </div>
+              </div>
+            </div>
         }
         <img onClick={() => setShowMenu(true)} className='w-6 md:hidden' src={assets.menu_icon} alt="" />
 
@@ -76,6 +91,14 @@ const Navbar = () => {
             <NavLink onClick={() => setShowMenu(false)} to='/doctors' ><p className='px-4 py-2 rounded full inline-block'>DOCTORS</p></NavLink>
             <NavLink onClick={() => setShowMenu(false)} to='/about' ><p className='px-4 py-2 rounded full inline-block'>ABOUT</p></NavLink>
             <NavLink onClick={() => setShowMenu(false)} to='/contact' ><p className='px-4 py-2 rounded full inline-block'>CONTACT</p></NavLink>
+            {/* Mobile Login Options */}
+            {!token && (
+              <>
+                <div className='w-full border-t border-gray-200 my-4'></div>
+                <NavLink onClick={() => setShowMenu(false)} to='/login' ><p className='px-4 py-2 rounded full inline-block bg-blue-100 text-blue-600'>LOGIN AS USER</p></NavLink>
+                <NavLink onClick={() => setShowMenu(false)} to='/doctor-registration' ><p className='px-4 py-2 rounded full inline-block bg-green-100 text-green-600'>JOIN AS DOCTOR</p></NavLink>
+              </>
+            )}
           </ul>
         </div>
       </div>

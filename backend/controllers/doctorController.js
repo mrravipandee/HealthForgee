@@ -2,6 +2,108 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
+import { v2 as cloudinary } from "cloudinary";
+
+// API for doctor Registration
+const registerDoctor = async (req, res) => {
+    try {
+        const { name, email, password, speciality, degree, experience, about, fees, address } = req.body;
+        const imageFile = req.file;
+
+        console.log('Doctor registration request received:');
+        console.log('Body:', req.body);
+        console.log('File:', imageFile ? 'Image uploaded' : 'No image');
+
+        // Check if all required fields are provided
+        if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees || !address) {
+            console.log('Missing required fields');
+            return res.json({ success: false, message: "Missing required fields. Please fill all details." });
+        }
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.json({ success: false, message: "Please enter a valid email address" });
+        }
+
+        // Check if doctor already exists
+        const existingDoctor = await doctorModel.findOne({ email });
+        if (existingDoctor) {
+            return res.json({ success: false, message: "Doctor with this email already exists" });
+        }
+
+        // Validate password length
+        if (password.length < 8) {
+            return res.json({ success: false, message: "Password must be at least 8 characters long" });
+        }
+
+        // Validate experience
+        if (isNaN(experience) || experience < 0) {
+            return res.json({ success: false, message: "Please enter a valid experience in years" });
+        }
+
+        // Validate fees
+        if (isNaN(fees) || fees < 0) {
+            return res.json({ success: false, message: "Please enter valid consultation fees" });
+        }
+
+        // Validate image
+        if (!imageFile) {
+            return res.json({ success: false, message: "Doctor profile image is required" });
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Upload image to cloudinary
+        console.log('Uploading image to Cloudinary...');
+        const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+            resource_type: "image",
+            folder: "doctors",
+            transformation: [
+                { width: 500, height: 500, crop: "fill" },
+                { quality: "auto" }
+            ]
+        });
+        const imageUrl = imageUpload.secure_url;
+        console.log('Image uploaded successfully:', imageUrl);
+
+        const doctorData = {
+            name: name.trim(),
+            email: email.toLowerCase().trim(),
+            image: imageUrl,
+            password: hashedPassword,
+            speciality,
+            degree: degree.trim(),
+            experience: parseInt(experience),
+            about: about.trim(),
+            fees: parseInt(fees),
+            address: JSON.parse(address),
+            available: true, // Default to available
+            date: Date.now()
+        };
+
+        console.log('Creating doctor record...');
+        const newDoctor = new doctorModel(doctorData);
+        const doctor = await newDoctor.save();
+        console.log('Doctor registered successfully:', doctor._id);
+
+        // Generate JWT token for immediate login
+        const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET);
+
+        res.json({ 
+            success: true, 
+            message: "Doctor registered successfully! You are now logged in.",
+            token,
+            doctorId: doctor._id
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: error.message });
+    }
+}
 
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
@@ -191,6 +293,7 @@ const doctorDashboard = async (req, res) => {
 }
 
 export {
+    registerDoctor,
     loginDoctor,
     appointmentsDoctor,
     appointmentCancel,
