@@ -82,6 +82,17 @@ const Login = () => {
           ? <p>Already have an account? <span onClick={() => setState('Login')} className='text-primary underline cursor-pointer'>Login here</span></p>
           : <p>Create an new account? <span onClick={() => setState('Sign Up')} className='text-primary underline cursor-pointer'>Click here</span></p>
         }
+        <div className='text-center mt-2'>
+          <p className='text-gray-600'>
+            Are you a doctor?{' '}
+            <span 
+              onClick={() => navigate('/doctor-login')} 
+              className='text-primary underline cursor-pointer hover:text-blue-800'
+            >
+              Doctor Login
+            </span>
+          </p>
+        </div>
       </div>
     </form>
   )

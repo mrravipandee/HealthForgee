@@ -435,6 +435,30 @@ const DoctorRegistration = () => {
                             )}
                         </button>
                     </div>
+
+                    {/* Login Link */}
+                    <div className='text-center mt-6'>
+                        <p className='text-gray-600'>
+                            Already have an account?{' '}
+                            <button
+                                type='button'
+                                onClick={() => navigate('/doctor-login')}
+                                className='text-blue-600 hover:text-blue-800 font-semibold underline transition-colors duration-200'
+                            >
+                                Login here
+                            </button>
+                        </p>
+                        <p className='text-gray-600 mt-2'>
+                            Are you a patient?{' '}
+                            <button
+                                type='button'
+                                onClick={() => navigate('/login')}
+                                className='text-blue-600 hover:text-blue-800 font-semibold underline transition-colors duration-200'
+                            >
+                                Patient Login
+                            </button>
+                        </p>
+                    </div>
                 </form>
             </div>
         </div>
