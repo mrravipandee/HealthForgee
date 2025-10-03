@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
@@ -20,7 +20,7 @@ const Verify = () => {
 
         try {
 
-            const { data } = await axios.post(backendUrl + "/api/user/verifyStripe", { success, appointmentId }, { headers: { token } })
+            const { data } = await axios.post(backendUrl + "/api/user/verifyStripe", { success, appointmentId }, { headers: { 'Authorization': `Bearer ${token}` } })
 
             if (data.success) {
                 toast.success(data.message)

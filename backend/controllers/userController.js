@@ -208,7 +208,8 @@ const updateHealthInfo = async (req, res) => {
 // API to book appointment
 const bookAppointment = async (req, res) => {
   try {
-    const { userId, docId, slotDate, slotTime } = req.body;
+    const { docId, slotDate, slotTime } = req.body;
+    const userId = req.userId; // Get userId from auth middleware
     const docData = await doctorModel.findById(docId).select("-password");
 
     if (!docData.available) {
@@ -260,7 +261,8 @@ const bookAppointment = async (req, res) => {
 // API to cancel appointment
 const cancelAppointment = async (req, res) => {
   try {
-    const { userId, appointmentId } = req.body;
+    const { appointmentId } = req.body;
+    const userId = req.userId; // Get userId from auth middleware
     const appointmentData = await appointmentModel.findById(appointmentId);
 
     // verify appointment user
@@ -295,7 +297,7 @@ const cancelAppointment = async (req, res) => {
 // API to get user appointments for frontend my-appointments page
 const listAppointment = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userId; // Get userId from auth middleware
     const appointments = await appointmentModel.find({ userId });
 
     res.json({ success: true, appointments });

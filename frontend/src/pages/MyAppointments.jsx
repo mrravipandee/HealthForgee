@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import axios from 'axios'
@@ -12,6 +12,8 @@ const MyAppointments = () => {
 
     const [appointments, setAppointments] = useState([])
     const [payment, setPayment] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
 
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -22,24 +24,34 @@ const MyAppointments = () => {
     }
 
     // Getting User Appointments Data Using API
-    const getUserAppointments = async () => {
+    const getUserAppointments = useCallback(async () => {
         try {
+            setLoading(true)
+            setError('')
 
-            const { data } = await axios.get(backendUrl + '/api/user/appointments', { headers: { token } })
-            setAppointments(data.appointments.reverse())
+            const { data } = await axios.get(backendUrl + '/api/user/appointments', { headers: { 'Authorization': `Bearer ${token}` } })
+            
+            if (data.success) {
+                setAppointments(data.appointments.reverse())
+            } else {
+                setError(data.message || 'Failed to load appointments')
+            }
 
         } catch (error) {
             console.log(error)
-            toast.error(error.message)
+            setError(error.response?.data?.message || error.message || 'Failed to load appointments')
+            toast.error(error.response?.data?.message || error.message)
+        } finally {
+            setLoading(false)
         }
-    }
+    }, [backendUrl, token])
 
     // Function to cancel appointment Using API
     const cancelAppointment = async (appointmentId) => {
 
         try {
 
-            const { data } = await axios.post(backendUrl + '/api/user/cancel-appointment', { appointmentId }, { headers: { token } })
+            const { data } = await axios.post(backendUrl + '/api/user/cancel-appointment', { appointmentId }, { headers: { 'Authorization': `Bearer ${token}` } })
 
             if (data.success) {
                 toast.success(data.message)
@@ -69,7 +81,7 @@ const MyAppointments = () => {
                 console.log(response)
 
                 try {
-                    const { data } = await axios.post(backendUrl + "/api/user/verifyRazorpay", response, { headers: { token } });
+                    const { data } = await axios.post(backendUrl + "/api/user/verifyRazorpay", response, { headers: { 'Authorization': `Bearer ${token}` } });
                     if (data.success) {
                         navigate('/my-appointments')
                         getUserAppointments()
@@ -87,7 +99,7 @@ const MyAppointments = () => {
     // Function to make payment using razorpay
     const appointmentRazorpay = async (appointmentId) => {
         try {
-            const { data } = await axios.post(backendUrl + '/api/user/payment-razorpay', { appointmentId }, { headers: { token } })
+            const { data } = await axios.post(backendUrl + '/api/user/payment-razorpay', { appointmentId }, { headers: { 'Authorization': `Bearer ${token}` } })
             if (data.success) {
                 initPay(data.order)
             }else{
@@ -102,7 +114,7 @@ const MyAppointments = () => {
     // Function to make payment using stripe
     const appointmentStripe = async (appointmentId) => {
         try {
-            const { data } = await axios.post(backendUrl + '/api/user/payment-stripe', { appointmentId }, { headers: { token } })
+            const { data } = await axios.post(backendUrl + '/api/user/payment-stripe', { appointmentId }, { headers: { 'Authorization': `Bearer ${token}` } })
             if (data.success) {
                 const { session_url } = data
                 window.location.replace(session_url)
@@ -121,13 +133,46 @@ const MyAppointments = () => {
         if (token) {
             getUserAppointments()
         }
-    }, [token])
+    }, [token, getUserAppointments])
 
     return (
         <div>
             <p className='pb-3 mt-12 text-lg font-medium text-gray-600 border-b'>My appointments</p>
-            <div className=''>
-                {appointments.map((item, index) => (
+            
+            {loading ? (
+                <div className='flex justify-center items-center py-20'>
+                    <div className='text-center'>
+                        <div className='border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-blue-600 mx-auto'></div>
+                        <p className='mt-4 text-gray-600'>Loading appointments...</p>
+                    </div>
+                </div>
+            ) : error ? (
+                <div className='flex justify-center items-center py-20'>
+                    <div className='text-center'>
+                        <p className='text-red-500 text-lg'>{error}</p>
+                        <button 
+                            onClick={getUserAppointments} 
+                            className='mt-4 bg-primary text-white px-6 py-2 rounded-lg'
+                        >
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            ) : appointments.length === 0 ? (
+                <div className='flex justify-center items-center py-20'>
+                    <div className='text-center'>
+                        <p className='text-gray-500 text-lg'>No appointments found</p>
+                        <button 
+                            onClick={() => navigate('/doctors')} 
+                            className='mt-4 bg-primary text-white px-6 py-2 rounded-lg'
+                        >
+                            Book an Appointment
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className=''>
+                    {appointments.map((item, index) => (
                     <div key={index} className='grid grid-cols-[1fr_2fr] gap-4 sm:flex sm:gap-6 py-4 border-b'>
                         <div>
                             <img className='w-36 bg-[#EAEFFF]' src={item.docData.image} alt="" />
@@ -154,7 +199,8 @@ const MyAppointments = () => {
                         </div>
                     </div>
                 ))}
-            </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -92,7 +92,7 @@ const PatientsInfo = ({ onClose }) => {
       const res = await axios.post(
         `${backendUrl}/api/user/update-health-info`,
         formDataToSend,
-        { headers: { token } }
+        { headers: { 'Authorization': `Bearer ${token}` } }
       );
       
       console.log("Response:", res.data);

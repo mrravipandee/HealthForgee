@@ -102,7 +102,11 @@ const Appointment = () => {
 
         try {
 
-            const { data } = await axios.post(backendUrl + '/api/user/book-appointment', { docId, slotDate, slotTime }, { headers: { token } })
+            const { data } = await axios.post(backendUrl + '/api/user/book-appointment', { docId, slotDate, slotTime }, { 
+                headers: { 
+                    'Authorization': `Bearer ${token}` 
+                } 
+            })
             if (data.success) {
                 toast.success(data.message)
                 getDoctosData()
@@ -130,7 +134,14 @@ const Appointment = () => {
         }
     }, [docInfo])
 
-    return docInfo ? (
+    return doctors.length === 0 ? (
+        <div className='flex justify-center items-center min-h-screen'>
+            <div className='text-center'>
+                <div className='border-gray-300 h-20 w-20 animate-spin rounded-full border-8 border-t-blue-600 mx-auto'></div>
+                <p className='mt-4 text-gray-600'>Loading doctor information...</p>
+            </div>
+        </div>
+    ) : docInfo ? (
         <div>
 
             {/* ---------- Doctor Details ----------- */}
@@ -182,6 +193,18 @@ const Appointment = () => {
 
             {/* Listing Releated Doctors */}
             <RelatedDoctors speciality={docInfo.speciality} docId={docId} />
+        </div>
+    ) : doctors.length > 0 ? (
+        <div className='flex justify-center items-center min-h-screen'>
+            <div className='text-center'>
+                <p className='text-xl text-gray-600'>Doctor not found</p>
+                <button 
+                    onClick={() => navigate('/doctors')} 
+                    className='mt-4 bg-primary text-white px-6 py-2 rounded-lg'
+                >
+                    Back to Doctors
+                </button>
+            </div>
         </div>
     ) : null
 }
