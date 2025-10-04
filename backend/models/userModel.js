@@ -25,8 +25,7 @@ const userSchema = new mongoose.Schema({
   height: { type: String, default: "" },
   bloodType: {
     type: String,
-    enum: ["A", "B", "AB", "O", "UNKNOWN"],
-    default: "UNKNOWN",
+    default: "Unknown",
   },
 
   // 🔹 Lifestyle Info
