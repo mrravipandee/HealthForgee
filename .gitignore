@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 build/
+.DS_Store
 
 # Logs
 npm-debug.log*
